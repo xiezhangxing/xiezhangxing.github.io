@@ -143,9 +143,13 @@ html {background-color: white}</style>
 <p>Android系统根据进程的优先级和运行的状态来决定哪些进程该杀掉，哪些该保留。Android中的进程分为五个等级：</p>
 <h3 id="1-前台进程">1.前台进程</h3>
 <p>用户当前操作的进程。一个进程满足以下情况时被即为前台进程。</p>
-<p><em>持有用户正在交互的activity（activity的onResume（）方法被调用）。
-</em>持有一个用户正在交互的activity绑定的service。<br><em>持有一个“前台”service——即service调用了startForgound()方法。
-</em>持有一个正在运行声明周期中某一个函数的service（onCreate()，onStart()，onDestroy()）。<br>*持有一个正在运行onReceive()方法的BroadcastReceiver。</p>
+<ul>
+<li>持有用户正在交互的activity（activity的onResume（）方法被调用）。</li>
+<li>持有一个用户正在交互的activity绑定的service。</li>
+<li>持有一个“前台”service——即service调用了startForgound()方法。</li>
+<li>持有一个正在运行声明周期中某一个函数的service（onCreate()，onStart()，onDestroy()）。</li>
+<li>持有一个正在运行onReceive()方法的BroadcastReceiver。</li>
+</ul>
 <p>总的来说，任意时刻系统里只有少量的前台进程。他们是最后被杀掉的——除非内存少得不能够同时维持他们的运行。</p>
 <h3 id="2-可见进程">2.可见进程</h3>
 <p>并不包含前台组件，但是仍然会影响用户在屏幕上能看到的东西。满足以下情况的进程为可见进程：<br>持有一个并不在前台，但仍然可见的activity（onPause()方法被调用）。比如被dialog遮挡的activity。<br>持有一个被可见activity绑定的service。<br>可见进程是非常重要的进程，一般不会被杀死，除非内存紧张到已无法维持前台进程的运行。</p>
@@ -219,7 +223,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="audqwrtqdgxm5nxg" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="0ni6yui0qr427zvp" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li></ul>
