@@ -126,13 +126,21 @@ html {background-color: white}</style>
 <p>Android没有为内存提供交换区（swap），而是使用内存分页（padding）和内存映射（memory-mapping）来管理内存。这意味着，我们修改的任意一块内存——不管是分配新对象还是操作映射过的页——都会残存在内存中而无法置换出去。所以彻底释放内存的唯一方法是释放对象的引用，以使垃圾收集器有效工作。这伴随着一个问题：任意已映射到内存但未修改的文件，比如说代码，可以在系统需要使用这块内存的时候被置换出去。</p>
 <h2 id="共享内存">共享内存</h2>
 <p>为了满足所有内存需要，Android在进程中共享内存。共享内存用以下方式实现：</p>
-<p>每一个app进程都是从一个称为Zygote的进程分裂（fork）来的。Zygote在当系统启动的时候启动，并加载framework层代码和资源。启动一个新的app进程的时候，系统会从Zygote分裂出一个进程来，在新进程加载该app的代码并运行。这使得在内存中为framwork层代码和资源分配的内存可以被所有app进程所共享。<br>大多数的static代码映射在一个进程里。这不单让同样的数据可以被进程共享，并且当需要的时候可以被置换出去。这样的static数据包括：Davik代码、app资源、.so包等。</p>
-<p>在很多地方，Android在显式分配共享内存（ashmen或者gralloc方式）的区域为进程间共享内存。比如，window surfaces在app和screen compositor之间使用共享内存，cursors buffers在content provider和client之间共享内存。</p>
+<ul>
+<li>每一个app进程都是从一个称为Zygote的进程分裂（fork）来的。Zygote在当系统启动的时候启动，并加载framework层代码和资源。启动一个新的app进程的时候，系统会从Zygote分裂出一个进程来，在新进程加载该app的代码并运行。这使得在内存中为framwork层代码和资源分配的内存可以被所有app进程所共享。</li>
+<li>大多数的static代码映射在一个进程里。这不单让同样的数据可以被进程共享，并且当需要的时候可以被置换出去。这样的static数据包括：Davik代码、app资源、.so包等。</li>
+<li>在很多地方，Android在显式分配共享内存（ashmen或者gralloc方式）的区域为进程间共享内存。比如，window surfaces在app和screen compositor之间使用共享内存，cursors buffers在content provider和client之间共享内存。</li>
+</ul>
 <h2 id="分配和回收app内存">分配和回收app内存</h2>
 <p>Android是如何给我们的app分配和回收内存的：</p>
-<p>每一个进程的Davik堆栈大小被限制在一个虚拟内存范围内。其定义了堆栈的逻辑大小，当需要时这个堆栈可以增长（但是不能超过系统为每个app设定的上限）。</p>
-<p>堆栈的逻辑大小跟堆栈实际使用的物理内存的总和并不一致。当Android检查我们的app堆栈的时候，会计算出一个被称为Proportional Set Size（PPS）的值，这个值是进程间共享内存的pages数，跟共享内存的app的数量成正比。</p>
-<p>Davik堆栈并不会压缩堆栈逻辑大小，这意味着Android并不会清除堆栈碎片。只有在堆栈的末端有不使用的空间时，Android才会去压缩堆栈的大小。垃圾回收之后，Davik会查看堆栈中未使用的页，然后使用madvise将这些未使用的页返还给内核。所以成对出现的大块分配和回收内存会导致所有的（或接近所有）已使用的物理内存。</p>
+<ul>
+<li><p>每一个进程的Davik堆栈大小被限制在一个虚拟内存范围内。其定义了堆栈的逻辑大小，当需要时这个堆栈可以增长（但是不能超过系统为每个app设定的上限）。</p>
+</li>
+<li><p>堆栈的逻辑大小跟堆栈实际使用的物理内存的总和并不一致。当Android检查我们的app堆栈的时候，会计算出一个被称为Proportional Set Size（PPS）的值，这个值是进程间共享内存的pages数，跟共享内存的app的数量成正比。</p>
+</li>
+<li><p>Davik堆栈并不会压缩堆栈逻辑大小，这意味着Android并不会清除堆栈碎片。只有在堆栈的末端有不使用的空间时，Android才会去压缩堆栈的大小。垃圾回收之后，Davik会查看堆栈中未使用的页，然后使用madvise将这些未使用的页返还给内核。所以成对出现的大块分配和回收内存会导致所有的（或接近所有）已使用的物理内存。</p>
+</li>
+</ul>
 <h2 id="app内存限制">app内存限制</h2>
 <p>Android是完全的多任务系统，显然一个app不能用完设备内存。为了维持多任务运行环境，Android为每一个app设定了堆栈大小的上限值。堆栈大小的准确值基于不同设备能提供的内存的大小确定。如果app达到了堆栈的容量，并且想分配更多内存，则会导致OutOfMemorryError错误。第一台Android手机（G1）每个app的堆栈上限只有16MB，现在很多手机跟平板已经超过48MB了。</p>
 <p>有时候，我们可能想查看当前设备能提供的堆栈空间的大小，可以通过getMemorryClass()来获取这个值。这个函数返回一个表示app可用堆栈大小的整数值，单位是MB字节。</p>
@@ -141,7 +149,7 @@ html {background-color: white}</style>
 <p>如果app有一个缓存的进程，这个进程持有这个app当前并不需要的内存，那这个app——当用户不使用的时候——就会影响整个系统的性能。所以当系统可用内存较低时，系统会杀掉在LRU中缓存的最近最少使用的进程。为了让我们的进程可以尽可能长地缓存，请遵循下一部分关于何时释放引用的建议。</p>
 <h2 id="Android进程分类">Android进程分类</h2>
 <p>Android系统根据进程的优先级和运行的状态来决定哪些进程该杀掉，哪些该保留。Android中的进程分为五个等级：</p>
-<h4 id="1-前台进程">1.前台进程</h4>
+<h3 id="1-前台进程">1.前台进程</h3>
 <p>用户当前操作的进程。一个进程满足以下情况时被即为前台进程。</p>
 <ul>
 <li>持有用户正在交互的activity（activity的onResume（）方法被调用）。</li>
@@ -151,14 +159,15 @@ html {background-color: white}</style>
 <li>持有一个正在运行onReceive()方法的BroadcastReceiver。</li>
 </ul>
 <p>总的来说，任意时刻系统里只有少量的前台进程。他们是最后被杀掉的——除非内存少得不能够同时维持他们的运行。</p>
-<h4 id="2-可见进程">2.可见进程</h4>
-<p>并不包含前台组件，但是仍然会影响用户在屏幕上能看到的东西。满足以下情况的进程为可见进程：<br>持有一个并不在前台，但仍然可见的activity（onPause()方法被调用）。比如被dialog遮挡的activity。<br>持有一个被可见activity绑定的service。<br>可见进程是非常重要的进程，一般不会被杀死，除非内存紧张到已无法维持前台进程的运行。</p>
-<h3 id="3-service进程">3.service进程</h3>
-<p>运行着一个已调用了startService()方法，已启动的service，并且不属于前两个优先级。虽然service进程并不直接影响用户所见，但是他们一般都在做着用户关心的事情（如播放音乐或者下载文件），所以系统会一直维持service进程直到内存不足以维持前台进程和可见进程的运行。</p>
-<h3 id="4-后台进程">4.后台进程</h3>
-<p>持有一个对用户不可见的activity的进程（即onStop()方法已调用）。这类进程不会直接影响用户体验，系统可以在任何时候杀掉以维持前台进程、可见进程和service进程。通常会存在相当多的后台进程，他们会保存在LRU里，以便用户最近使用的activity在最后杀掉。如果activity正确实现了生命周期的方法，并且妥善保存当前状态，杀掉他们并不会对用户体验造成影响，因为一旦用户重新回到这个activity，activity会恢复所有可见状态。</p>
-<h3 id="5-空进程">5.空进程</h3>
-<p>不持有任意活动的程序组件的进程。保持这类进程的唯一原因是为了缓存，为了下次运行的时候可以减少启动时间。系统经常会杀掉这类进程，以平衡进程缓存和内核缓存之间需要的系统资源。</p>
+<h3 id="2-可见进程">2.可见进程</h3>
+<p>并不包含前台组件，但是仍然会影响用户在屏幕上能看到的东西。满足以下情况的进程为可见进程：</p>
+<ul>
+<li>持有一个并不在前台，但仍然可见的activity（onPause()方法被调用）。比如被dialog遮挡的activity。</li>
+<li>持有一个被可见activity绑定的service。<br>可见进程是非常重要的进程，一般不会被杀死，除非内存紧张到已无法维持前台进程的运行。<h3 id="3-service进程">3.service进程</h3>
+运行着一个已调用了startService()方法，已启动的service，并且不属于前两个优先级。虽然service进程并不直接影响用户所见，但是他们一般都在做着用户关心的事情（如播放音乐或者下载文件），所以系统会一直维持service进程直到内存不足以维持前台进程和可见进程的运行。<h3 id="4-后台进程">4.后台进程</h3>
+持有一个对用户不可见的activity的进程（即onStop()方法已调用）。这类进程不会直接影响用户体验，系统可以在任何时候杀掉以维持前台进程、可见进程和service进程。通常会存在相当多的后台进程，他们会保存在LRU里，以便用户最近使用的activity在最后杀掉。如果activity正确实现了生命周期的方法，并且妥善保存当前状态，杀掉他们并不会对用户体验造成影响，因为一旦用户重新回到这个activity，activity会恢复所有可见状态。<h3 id="5-空进程">5.空进程</h3>
+不持有任意活动的程序组件的进程。保持这类进程的唯一原因是为了缓存，为了下次运行的时候可以减少启动时间。系统经常会杀掉这类进程，以平衡进程缓存和内核缓存之间需要的系统资源。</li>
+</ul>
 <h2 id="app应该如何管理内存">app应该如何管理内存</h2>
 <p>我们应该在整个开发周期中考虑内存限制，包括在app设计过程中。</p>
 <h2 id="尽量少使用service">尽量少使用service</h2>
@@ -172,19 +181,23 @@ html {background-color: white}</style>
 <p>请注意只有当app的所有UI组件都不可见的时候，才能通过TRIM_MEMORY_UI_HIDDEN接收到onTrimMemory()回调方法。这一点跟onStop()函数有所区别，onStop()是只要当前activity不可见就会调用。所以虽然应该实现onStop()函数去释放activity的资源，比如网络连接和注销广播接收者，但是不应该在接收到onTrimMemory(TRIM_MEMORY_UI_HIDDEN)前释放UI资源。这能确保当用户在同一app的不同activity返回的时候，可以快速继续原来的activity。</p>
 <h2 id="当内存紧张的时候释放内存">当内存紧张的时候释放内存</h2>
 <p>在app的生命周期的任意阶段，onTrimMemory()回调方法还告诉我们机器的内存在减少。我们应该在onTrimMemory()回调方法里根据这些内存等级来决定怎样释放资源。</p>
-<h3 id="TRIM_MEMORY_RUNNING_MODERATE">TRIM_MEMORY_RUNNING_MODERATE</h3>
-<p>app在运行中，并且不会被杀死，但是机器已经运行在低内存状态，并且系统已经在杀死LRU中的进程。</p>
-<h3 id="TRIM_MEMORY_RUNNING_LOW">TRIM_MEMORY_RUNNING_LOW</h3>
-<p>app在运行中，并且不会被杀死，但是机器已经运行在更低的内存状态，所以应该释放一些不再使用的资源来提升系统性能（这对app的性能有直接影响）。 </p>
-<h3 id="TRIM_MEMORY_RUNNING_CRITICAL">TRIM_MEMORY_RUNNING_CRITICAL</h3>
-<p>app仍在在运行，但是系统已经杀掉了LRU中的大部分进程，所以这时应该释放不太重要的资源。如果系统不能回收足够的内存，它将会清理掉LRU的所有缓存尤其是有运行中的service的进程，以保证系统正常运行。</p>
+<ul>
+<li><p>TRIM_MEMORY_RUNNING_MODERATE<br>app在运行中，并且不会被杀死，但是机器已经运行在低内存状态，并且系统已经在杀死LRU中的进程。</p>
+</li>
+<li><p>TRIM_MEMORY_RUNNING_LOW<br>app在运行中，并且不会被杀死，但是机器已经运行在更低的内存状态，所以应该释放一些不再使用的资源来提升系统性能（这对app的性能有直接影响）。 </p>
+</li>
+<li><p>TRIM_MEMORY_RUNNING_CRITICAL<br>app仍在在运行，但是系统已经杀掉了LRU中的大部分进程，所以这时应该释放不太重要的资源。如果系统不能回收足够的内存，它将会清理掉LRU的所有缓存尤其是有运行中的service的进程，以保证系统正常运行。</p>
+</li>
+</ul>
 <p>另外，当app在缓存里的时候，会在TrimMemory()收到以下等级：</p>
-<h3 id="TRIM_MEMORY_BACKGROUND">TRIM_MEMORY_BACKGROUND</h3>
-<p>系统运行在低内存状态，并且我们的进程接近LRU列表的开头。虽然app并没有太高的风险会被杀掉，但系统可能已经在杀掉LRU里的缓存。应该释放的进程里容易恢复的资源以使进程能够保留在LRU中。</p>
-<h3 id="TRIM_MEMORY_MODERATE">TRIM_MEMORY_MODERATE</h3>
-<p>系统运行在低内存状态，并且进程在LRU列表的中间。如果系统内存更紧张，app可能会被杀死。</p>
-<h3 id="TRIM_MEMORY_COMPLETE">TRIM_MEMORY_COMPLETE</h3>
-<p>系统运行在低内存状态，并且如果系统内存继续减少，我们的app是最有可能被杀掉的之一。应该释放app中所有不重要的资源以使状态可以保存。<br>onTrimMemory()是在API14才添加的，可以在低版本中使用onLowMemory()，这个函数跟TRIM_MEMORY_COMPLETE效果差不多。</p>
+<ul>
+<li><p>TRIM_MEMORY_BACKGROUND<br>系统运行在低内存状态，并且我们的进程接近LRU列表的开头。虽然app并没有太高的风险会被杀掉，但系统可能已经在杀掉LRU里的缓存。应该释放的进程里容易恢复的资源以使进程能够保留在LRU中。</p>
+</li>
+<li><p>TRIM_MEMORY_MODERATE<br>系统运行在低内存状态，并且进程在LRU列表的中间。如果系统内存更紧张，app可能会被杀死。</p>
+</li>
+<li><p>TRIM_MEMORY_COMPLETE<br>系统运行在低内存状态，并且如果系统内存继续减少，我们的app是最有可能被杀掉的之一。应该释放app中所有不重要的资源以使状态可以保存。<br>onTrimMemory()是在API14才添加的，可以在低版本中使用onLowMemory()，这个函数跟TRIM_MEMORY_COMPLETE效果差不多。</p>
+</li>
+</ul>
 <h2 id="查看应该使用多少内存">查看应该使用多少内存</h2>
 <p>正如前文提到的，每一个Android设备能用的最大内存不一样，这导致不同设备里每个app的堆栈大小限制是不一样的。可以使用getMemoryClass()获取app可以使用的堆栈大小，单位是MB。如果app尝试分配超过这个数的内存，将会产生OutOfMemoryError错误。</p>
 <p>在非常特殊的情况下，可以通过在manifest的<application>标签内设置largeHeap属性为“true”来获得更大的堆栈大小。设置后，可以使用getLargeMemoryClass()获取app可以使用的堆栈大小。</application></p>
@@ -223,7 +236,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="mlavocfri0wxf6yu" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="dm904lt56rpicr5q" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li></ul>
@@ -254,7 +267,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/test/" data-id="wxfcgeigxp98842m" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/test/" data-id="00o79kqansvgddp1" class="article-share-link">分享</a>
       
       
     </footer>
@@ -309,7 +322,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/02/hello-world/" data-id="m0lnur7z5nvpiayx" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/02/hello-world/" data-id="yr2qgkja3seolonj" class="article-share-link">分享</a>
       
       
     </footer>
