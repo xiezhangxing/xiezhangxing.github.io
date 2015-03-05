@@ -147,9 +147,7 @@ html {background-color: white}</style>
 <p>当用户切换app的时候，Android没有采用交换区的方式，而是在LRU中缓存不可见状态的进程。比如，用户启动了一个app，系统就为这个app创建一个进程，但是当用户离开这个app的时候，这个进程并没有退出。系统缓存了进程，所以app之间的切换可以更流畅。</p>
 <p>如果app有一个缓存的进程，这个进程持有这个app当前并不需要的内存，那这个app——当用户不使用的时候——就会影响整个系统的性能。所以当系统可用内存较低时，系统会杀掉在LRU中缓存的最近最少使用的进程。为了让我们的进程可以尽可能长地缓存，请遵循下一部分关于何时释放引用的建议。</p>
 <h2 id="Android进程分类">Android进程分类</h2>
-<p>Android系统根据进程的优先级和运行的状态来决定哪些进程该杀掉，哪些该保留。Android中的进程分为五个等级：</p>
-<h3 id="1-前台进程">1.前台进程</h3>
-<p>用户当前操作的进程。一个进程满足以下情况时被即为前台进程。</p>
+<p>Android系统根据进程的优先级和运行的状态来决定哪些进程该杀掉，哪些该保留。Android中的进程分为五个等级：<br>1.前台进程<br>用户当前操作的进程。一个进程满足以下情况时被即为前台进程。</p>
 <ul>
 <li>持有用户正在交互的activity（activity的onResume（）方法被调用）。</li>
 <li>持有一个用户正在交互的activity绑定的service。</li>
@@ -157,9 +155,7 @@ html {background-color: white}</style>
 <li>持有一个正在运行声明周期中某一个函数的service（onCreate()，onStart()，onDestroy()）。</li>
 <li>持有一个正在运行onReceive()方法的BroadcastReceiver。</li>
 </ul>
-<p>总的来说，任意时刻系统里只有少量的前台进程。他们是最后被杀掉的——除非内存少得不能够同时维持他们的运行。</p>
-<h3 id="2-可见进程">2.可见进程</h3>
-<p>并不包含前台组件，但是仍然会影响用户在屏幕上能看到的东西。满足以下情况的进程为可见进程：<br>持有一个并不在前台，但仍然可见的activity（onPause()方法被调用）。比如被dialog遮挡的activity。<br>持有一个被可见activity绑定的service。<br>可见进程是非常重要的进程，一般不会被杀死，除非内存紧张到已无法维持前台进程的运行。</p>
+<p>总的来说，任意时刻系统里只有少量的前台进程。他们是最后被杀掉的——除非内存少得不能够同时维持他们的运行。<br>2.可见进程<br>并不包含前台组件，但是仍然会影响用户在屏幕上能看到的东西。满足以下情况的进程为可见进程：<br>持有一个并不在前台，但仍然可见的activity（onPause()方法被调用）。比如被dialog遮挡的activity。<br>持有一个被可见activity绑定的service。<br>可见进程是非常重要的进程，一般不会被杀死，除非内存紧张到已无法维持前台进程的运行。</p>
 <h3 id="3-service进程">3.service进程</h3>
 <p>运行着一个已调用了startService()方法，已启动的service，并且不属于前两个优先级。虽然service进程并不直接影响用户所见，但是他们一般都在做着用户关心的事情（如播放音乐或者下载文件），所以系统会一直维持service进程直到内存不足以维持前台进程和可见进程的运行。</p>
 <h3 id="4-后台进程">4.后台进程</h3>
@@ -230,7 +226,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="0ni6yui0qr427zvp" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="opesc4zv83zq9k5g" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li></ul>
