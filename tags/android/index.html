@@ -119,13 +119,15 @@ html {background-color: white}</style>
       
         <p>参考文章：<br>    <a href="http://developer.android.com/training/articles/memory.html" target="_blank" rel="external">Managing Your App’s Memory</a><br>    <a href="http://twinlogix.com/en/blog/memory-management-android-apps" target="_blank" rel="external">Memory management for Android apps</a><br>    <a href="http://developer.android.com/guide/components/processes-and-threads.html" target="_blank" rel="external">Processes and Threads</a></p>
 <pre><code>内存在所有软件开发环境中都是非常宝贵的资源，尤其是在资源有限的移动设备中。虽然Davik虚拟机帮我们进行了垃圾回收过程，但并不意味着我们可以忽视如何分配和回收内存。
+
 为了让垃圾收集器回收app的内存，我们需要极力避免产生内存泄漏（通常由于在全局变量里保持对象的引用而使得垃圾回收无法进行所引发）和在合适的时间释放对象引用。对大多数的app来说，剩下的工作由Davik垃圾收集器来完成：当对象离开app的活动线程的范围时，系统会自动回收相应的内存。
+
 本文将介绍Android系统是如何管理app进程和内存分配，以及我们在开发过程中应该如何减少内存的使用。
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="8qkejbbfbb1euujk" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="8ftvbnrfj8zatklj" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li></ul>
