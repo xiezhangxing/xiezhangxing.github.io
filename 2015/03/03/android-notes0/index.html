@@ -127,10 +127,10 @@ html {background-color: white}</style>
         <h2 id="参考文章：">参考文章：</h2>
 <p><a href="http://developer.android.com/training/articles/memory.html" target="_blank" rel="external">Managing Your App’s Memory</a><br><a href="http://twinlogix.com/en/blog/memory-management-android-apps" target="_blank" rel="external">Memory management for Android apps</a><br><a href="http://developer.android.com/guide/components/processes-and-threads.html" target="_blank" rel="external">Processes and Threads</a></p>
 <p>内存在所有软件开发环境中都是非常宝贵的资源，尤其是在资源有限的移动设备中。虽然Davik虚拟机帮我们进行了垃圾回收过程，但并不意味着我们可以忽视如何分配和回收内存。</p>
-<p>为了让垃圾收集器回收app的内存，我们需要极力避免产生内存泄漏（通常由于在全局变量里保持对象的引用而使得垃圾回收无法进行所引发）和在合适的时间释放对象引用。对大多数的app来说，剩下的工作由Davik垃圾收集器来完成：当对象离开app的活动线程的范围时，系统会自动回收相应的内存。<br>本文将介绍Android系统是如何管理app进程和内存分配，以及我们在开发过程中应该如何减少内存的使用。</p>
+<p>为了让垃圾收集器回收app的内存，我们需要极力避免产生内存泄漏（通常由于在全局变量里保持对象的引用而使得垃圾回收无法进行所引发）和在合适的时间释放对象引用。对大多数的app来说，剩下的工作由Davik垃圾收集器来完成：当对象离开app的活动线程的范围时，系统会自动回收相应的内存。</p>
+<p>本文将介绍Android系统是如何管理app进程和内存分配，以及我们在开发过程中应该如何减少内存的使用。</p>
 <h2 id="Android系统如何管理内存">Android系统如何管理内存</h2>
-<p>Android没有为内存提供交换区（swap），而是使用内存分页（padding）和内存映射（memory-mapping）来管理内存。这意味着，我们修改的任意一块内存——不管是分配新对象还是操作映射过的页——都会残存在内存中而无法置换出去。所以彻底释放内存的唯一方法是释放对象的引用，以使垃圾收集器有效工作。这伴随着一个问题：任意已映</p>
-<p>射到内存但未修改的文件，比如说代码，可以在系统需要使用这块内存的时候被置换出去。</p>
+<p>Android没有为内存提供交换区（swap），而是使用内存分页（padding）和内存映射（memory-mapping）来管理内存。这意味着，我们修改的任意一块内存——不管是分配新对象还是操作映射过的页——都会残存在内存中而无法置换出去。所以彻底释放内存的唯一方法是释放对象的引用，以使垃圾收集器有效工作。这伴随着一个问题：任意已映射到内存但未修改的文件，比如说代码，可以在系统需要使用这块内存的时候被置换出去。</p>
 <h2 id="共享内存">共享内存</h2>
 <p>为了满足所有内存需要，Android在进程中共享内存。共享内存用以下方式实现：</p>
 <p>每一个app进程都是从一个称为Zygote的进程分裂（fork）来的。Zygote在当系统启动的时候启动，并加载framework层代码和资源。启动一个新的app进程的时候，系统会从Zygote分裂出一个进程来，在新进程加载该app的代码并运行。这使得在内存中为framwork层代码和资源分配的内存可以被所有app进程所共享。<br>大多数的static代码映射在一个进程里。这不单让同样的数据可以被进程共享，并且当需要的时候可以被置换出去。这样的static数据包括：Davik代码、app资源、.so包等。</p>
@@ -224,7 +224,7 @@ html {background-color: white}</style>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="2oyxibtbnpfnsnv0" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2015/03/03/android-notes0/" data-id="buyco13f0rmglqer" class="article-share-link">分享</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android/">android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/性能/">性能</a></li></ul>
