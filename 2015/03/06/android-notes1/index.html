@@ -80,7 +80,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-06T05:32:58.502Z" itemprop="dateModified">Mar 6 2015</time>
+    Updated:<time datetime="2015-03-06T05:40:04.590Z" itemprop="dateModified">Mar 6 2015</time>
     
   </p>
 </header>
@@ -89,7 +89,7 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">4.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">5.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">6.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">7.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">8.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">9.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">10.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">11.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
 		</div>
 		
 		<p>本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。</p>
@@ -114,50 +114,75 @@
 <h2 id="使用static">使用static</h2>
 <p>如果不需要使用一个对象的属性，那么可以将函数设为static，这会使调用效率有大概15%到20%的提高。</p>
 <h2 id="常量使用Static_Final">常量使用Static Final</h2>
-<p>考虑下面两个声明：<br>    staticint intVal =42;<br>    staticString strVal =”Hello, world!”;<br>    当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。<br>    我们可以通过“final”关键字来改善这个过程：<br>    staticfinalint intVal =42;<br>    staticfinalString strVal =”Hello, world!”;<br>    此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></clinit></p>
-<p>避免内部Getter/Setter方法 </p>
-<pre><code><span class="comment">在C</span><span class="literal">+</span><span class="literal">+</span><span class="comment">等本地语言中，习惯使用getter方法（i</span> <span class="comment">=</span> <span class="comment">getCount()）代替直接获取字段值（i</span> <span class="comment">=</span> <span class="comment">mCount）。这是C</span><span class="literal">+</span><span class="literal">+</span><span class="comment">里非常好的习惯，并且这个习惯同样流行于其他面向对象语言里。</span>
-<span class="comment">但是在Android里，这不是好的想法。调用虚函数的代价是高昂的，比通过访问字段值成本要高得多。在公共接口里可以遵循面向对象编程里使用getter/setter的习惯，但是在一个类里面，应该直接访问字段值。</span>
-<span class="comment">在没有JIT的设备里，值访问要比getter方法快3倍，而在JIT环境里，值访问要比getter方法快7倍。</span>
-</code></pre><p>使用增强的for循环</p>
-<pre><code>增强的<span class="keyword">for</span>循环（即<span class="keyword">for</span>-<span class="keyword">each</span>循环）可以用在实现了Iterable接口的容器和数组中。对ArrayList来说，<span class="keyword">for</span>-<span class="keyword">each</span>循环的速度要快<span class="number">3</span>倍，但是其他容器则速度一样。
-</code></pre><p>staticclassFoo{<br>    int mSplat;<br>}</p>
-<p>Foo[] mArray =…</p>
-<p>publicvoid zero(){<br>    int sum =0;<br>    for(int i =0; i &lt; mArray.length;++i){<br>        sum += mArray[i].mSplat;<br>    }<br>}</p>
-<p>publicvoid one(){<br>    int sum =0;<br>    Foo[] localArray = mArray;<br>    int len = localArray.length;</p>
-<pre><code><span class="keyword">for</span>(int <span class="built_in">i</span> =<span class="number">0</span>; <span class="built_in">i</span> &lt; len;++<span class="built_in">i</span>)<span class="cell">{
-    sum += localArray[i].mSplat;
-}</span>
-</code></pre><p>}</p>
-<p>publicvoid two(){<br>    int sum =0;<br>    for(Foo a : mArray){<br>        sum += a.mSplat;<br>    }<br>}<br>zero()是最慢的，因为每次迭代都会计算一次数组长度。<br>one()稍快，它将所有东西都存为本地变量，避免了查找过程。只有数组长度不必计算这一点得到了提升。<br>tow()在JIT环境里是最快的，但是在非JIT环境里跟one()速度一样。</p>
-<p>使用包访问代替私有内部类访问</p>
-<pre><code>思考如下类定义：
-</code></pre><p>publicclassFoo{<br>    privateclassInner{<br>        void stuff(){<br>            Foo.this.doStuff(Foo.this.mValue);<br>        }<br>    }</p>
-<pre><code>privateint mValue;
+<p>考虑下面两个声明：<br>    staticint intVal =42;<br>    staticString strVal =”Hello, world!”;</p>
+<p>当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。</clinit></p>
+<p>我们可以通过“final”关键字来改善这个过程：<br>    staticfinalint intVal =42;<br>    staticfinalString strVal =”Hello, world!”;</p>
+<p>此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></p>
+<h2 id="避免内部Getter/Setter方法">避免内部Getter/Setter方法</h2>
+<p>在C++等本地语言中，习惯使用getter方法（i = getCount()）代替直接获取字段值（i = mCount）。这是C++里非常好的习惯，并且这个习惯同样流行于其他面向对象语言里。</p>
+<p>但是在Android里，这不是好的想法。调用虚函数的代价是高昂的，比通过访问字段值成本要高得多。在公共接口里可以遵循面向对象编程里使用getter/setter的习惯，但是在一个类里面，应该直接访问字段值。</p>
+<p>在没有JIT的设备里，值访问要比getter方法快3倍，而在JIT环境里，值访问要比getter方法快7倍。</p>
+<h2 id="使用增强的for循环">使用增强的for循环</h2>
+<p>增强的for循环（即for-each循环）可以用在实现了Iterable接口的容器和数组中。对ArrayList来说，for-each循环的速度要快3倍，但是其他容器则速度一样。<br>    staticclassFoo{<br>        int mSplat;<br>    }</p>
+<pre><code>Foo[] mArray =...
 
-publicvoid run(){
-    Innerin=newInner();
-    mValue =<span class="number">27</span>;
-    <span class="keyword">in</span>.stuff();
+publicvoid zero(){
+    <span class="keyword">int</span> <span class="keyword">sum</span> =<span class="number">0</span>;
+    <span class="keyword">for</span>(<span class="keyword">int</span> i =<span class="number">0</span>; i &lt; mArray.length;++i){
+        <span class="keyword">sum</span> += mArray[i].mSplat;
+    }
 }
 
-privatevoid doStuff(<span class="keyword">int</span> <span class="keyword">value</span>){
-    System.<span class="keyword">out</span>.println(<span class="string">"Value is "</span>+ <span class="keyword">value</span>);
+publicvoid one(){
+    <span class="keyword">int</span> <span class="keyword">sum</span> =<span class="number">0</span>;
+    Foo[] localArray = mArray;
+    <span class="keyword">int</span> len = localArray.length;
+
+    <span class="keyword">for</span>(<span class="keyword">int</span> i =<span class="number">0</span>; i &lt; len;++i){
+        <span class="keyword">sum</span> += localArray[i].mSplat;
+    }
 }
-</code></pre><p>}<br>    注意我们在这里定义了可直接访问外部类的私有属性和私有方法的私有内部类（Foo$Inner）。这是合法的，并且代码运行的结果正如我们期待的那样打印了“Value is 27”。<br>    问题是因为Foo和Foo$Inner是不同的类，VM认为在Foo$Inner直接访问Foo的私有成员是非法的，即使在Java里允许内部类访问外部类的私有成员。为了弥补这一点，编译器生成了成对出现的如下代码：<br>/<em>package</em>/staticintFoo.access$100(Foo foo){<br>    return foo.mValue;<br>}<br>/<em>package</em>/staticvoidFoo.access$200(Foo foo,int value){<br>    foo.doStuff(value);<br>}<br>    当内部类访问外部类的私有成员时，都会调用这样的静态方法。这意味着，以上代码可以归结为通过accessor方法来访问成员变量。我们前文谈到accessor方式比直接访问要慢，这里就是一个语言习惯如何以你难以注意到的方式影响性能的例子。<br>    如果在对性能要求高的地方写这样的代码，我们应该使用包访问而不要用内部类。但是，这样写意味着这些属性可以被同一个包里的类访问，所以不要再公开API里这样写。</p>
-<p>不要使用float类型</p>
-<pre><code>在Android设备里，<span class="keyword">float</span>型要比integer慢两倍。
-</code></pre><p>了解并使用库</p>
-<pre><code>使用库而不是自己造轮子，除了通常的原因外，请记住系统可以自由使用汇编程序替换库方法，这比JIT使用相同的Java语句所生成的最好的代码还要好。典型的例子是<span class="built_in">String</span>.indexof()和相关api，Davik会使用一个内建函数来代替。类似地，在Nexus one里，System.arraycopy()方法要比手写的循环快<span class="number">9</span>倍。
-</code></pre><p>小心使用native方法</p>
-<pre><code>通过Android NDK来使用<span class="keyword">native</span>方法开发Android程序并不一定比用Java实现更高效。首先，在java-<span class="keyword">native</span>转换的过程中有一定的开销。并且JIT无法在这些边界之间做出优化。如果你正在分配本地资源（本地堆内存、文件或者其他东西），这会是定时回收这些资源变得更加困难。你需要为运行这个程序的设备的不同架构而编译不同的版本。甚至要为你认为是同一架构的设备编译不同的版本：为G1的ARM处理器编译的<span class="keyword">native</span>代码无法充分利用Nexus one的ARM处理器的优势，反过来亦然。
-<span class="keyword">native</span>代码的根本意义是你已经有了<span class="keyword">native</span>代码库而需要移植到Android，它的目的并不是为了提升Android程序的某部分java代码的速度。
-</code></pre><p>性能误解</p>
-<pre><code>在没有JIT的设备里，使用实现类而不是接口来调用一个方法确实要稍微高效一点。（比如使用HashMap <span class="keyword">map</span>来调用一个方法要比<span class="keyword">Map</span> <span class="keyword">map</span>要高效一点，即使在两种情况下<span class="keyword">map</span>实际上可能都是HashMap。）但是这样使用并没有快太多，只有大概<span class="number">6</span>%左右。而且，JIT使得两种方式并无多大区别了。
-在没有JIT的设备里，使用缓存方式获取属性值要比多次获取快大概<span class="number">20</span>%。而在有JIT的设备里，两种方式没有太大区别，所以这并不是一个有效的优化手段，除非这样使用是为了代码更方便阅读。
-</code></pre><p>估算程序性能</p>
-<pre><code>在开始优化你的程序之前，明确你确实有问题需要解决。确定你可以准确估计现有代码的性能，不然你就无法估计修改代码后可以带来多少性能。
-</code></pre>  
+
+publicvoid two(){
+    <span class="keyword">int</span> <span class="keyword">sum</span> =<span class="number">0</span>;
+    <span class="keyword">for</span>(Foo a : mArray){
+        <span class="keyword">sum</span> += a.mSplat;
+    }
+}
+</code></pre><p>zero()是最慢的，因为每次迭代都会计算一次数组长度。</p>
+<p>one()稍快，它将所有东西都存为本地变量，避免了查找过程。只有数组长度不必计算这一点得到了提升。</p>
+<p>tow()在JIT环境里是最快的，但是在非JIT环境里跟one()速度一样。</p>
+<h2 id="使用包访问代替私有内部类访问">使用包访问代替私有内部类访问</h2>
+<p>思考如下类定义：<br>    publicclassFoo{<br>        privateclassInner{<br>            void stuff(){<br>                Foo.this.doStuff(Foo.this.mValue);<br>            }<br>        }</p>
+<pre><code>    privateint mValue;
+
+    publicvoid run(){
+        Innerin=newInner();
+        mValue =<span class="number">27</span>;
+        <span class="keyword">in</span>.stuff();
+    }
+
+    privatevoid doStuff(<span class="keyword">int</span> <span class="keyword">value</span>){
+        System.<span class="keyword">out</span>.println(<span class="string">"Value is "</span>+ <span class="keyword">value</span>);
+    }
+}
+</code></pre><p>注意我们在这里定义了可直接访问外部类的私有属性和私有方法的私有内部类（Foo$Inner）。这是合法的，并且代码运行的结果正如我们期待的那样打印了“Value is 27”。</p>
+<p>问题是因为Foo和Foo$Inner是不同的类，VM认为在Foo$Inner直接访问Foo的私有成员是非法的，即使在Java里允许内部类访问外部类的私有成员。为了弥补这一点，编译器生成了成对出现的如下代码：<br>    /<em>package</em>/staticintFoo.access$100(Foo foo){<br>        return foo.mValue;<br>    }<br>    /<em>package</em>/staticvoidFoo.access$200(Foo foo,int value){<br>        foo.doStuff(value);<br>    }</p>
+<p>当内部类访问外部类的私有成员时，都会调用这样的静态方法。这意味着，以上代码可以归结为通过accessor方法来访问成员变量。我们前文谈到accessor方式比直接访问要慢，这里就是一个语言习惯如何以你难以注意到的方式影响性能的例子。</p>
+<p>如果在对性能要求高的地方写这样的代码，我们应该使用包访问而不要用内部类。但是，这样写意味着这些属性可以被同一个包里的类访问，所以不要再公开API里这样写。</p>
+<h2 id="不要使用float类型">不要使用float类型</h2>
+<p>在Android设备里，float型要比integer慢两倍。</p>
+<h2 id="了解并使用库">了解并使用库</h2>
+<p>使用库而不是自己造轮子，除了通常的原因外，请记住系统可以自由使用汇编程序替换库方法，这比JIT使用相同的Java语句所生成的最好的代码还要好。典型的例子是String.indexof()和相关api，Davik会使用一个内建函数来代替。类似地，在Nexus one里，System.arraycopy()方法要比手写的循环快9倍。</p>
+<h2 id="小心使用native方法">小心使用native方法</h2>
+<p>通过Android NDK来使用native方法开发Android程序并不一定比用Java实现更高效。首先，在java-native转换的过程中有一定的开销。并且JIT无法在这些边界之间做出优化。如果你正在分配本地资源（本地堆内存、文件或者其他东西），这会是定时回收这些资源变得更加困难。你需要为运行这个程序的设备的不同架构而编译不同的版本。甚至要为你认为是同一架构的设备编译不同的版本：为G1的ARM处理器编译的native代码无法充分利用Nexus one的ARM处理器的优势，反过来亦然。</p>
+<p>native代码的根本意义是你已经有了native代码库而需要移植到Android，它的目的并不是为了提升Android程序的某部分java代码的速度。</p>
+<h2 id="性能误解">性能误解</h2>
+<p>在没有JIT的设备里，使用实现类而不是接口来调用一个方法确实要稍微高效一点。（比如使用HashMap map来调用一个方法要比Map map要高效一点，即使在两种情况下map实际上可能都是HashMap。）但是这样使用并没有快太多，只有大概6%左右。而且，JIT使得两种方式并无多大区别了。</p>
+<p>在没有JIT的设备里，使用缓存方式获取属性值要比多次获取快大概20%。而在有JIT的设备里，两种方式没有太大区别，所以这并不是一个有效的优化手段，除非这样使用是为了代码更方便阅读。</p>
+<h2 id="估算程序性能">估算程序性能</h2>
+<p>在开始优化你的程序之前，明确你确实有问题需要解决。确定你可以准确估计现有代码的性能，不然你就无法估计修改代码后可以带来多少性能。</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 
@@ -192,7 +217,7 @@ privatevoid doStuff(<span class="keyword">int</span> <span class="keyword">value
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">4.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">5.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">6.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">7.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">8.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">9.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">10.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">11.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
   </div>
 
 <div id="asidepart">
