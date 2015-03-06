@@ -80,7 +80,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-06T05:31:36.658Z" itemprop="dateModified">Mar 6 2015</time>
+    Updated:<time datetime="2015-03-06T05:32:58.502Z" itemprop="dateModified">Mar 6 2015</time>
     
   </p>
 </header>
@@ -114,7 +114,7 @@
 <h2 id="使用static">使用static</h2>
 <p>如果不需要使用一个对象的属性，那么可以将函数设为static，这会使调用效率有大概15%到20%的提高。</p>
 <h2 id="常量使用Static_Final">常量使用Static Final</h2>
-<p>考虑下面两个声明：<br>   staticint intVal =42;<br>   staticString strVal =”Hello, world!”;<br>    当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。<br>    我们可以通过“final”关键字来改善这个过程：<br>staticfinalint intVal =42;<br>staticfinalString strVal =”Hello, world!”;<br>    此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></clinit></p>
+<p>考虑下面两个声明：<br>    staticint intVal =42;<br>    staticString strVal =”Hello, world!”;<br>    当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。<br>    我们可以通过“final”关键字来改善这个过程：<br>    staticfinalint intVal =42;<br>    staticfinalString strVal =”Hello, world!”;<br>    此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></clinit></p>
 <p>避免内部Getter/Setter方法 </p>
 <pre><code><span class="comment">在C</span><span class="literal">+</span><span class="literal">+</span><span class="comment">等本地语言中，习惯使用getter方法（i</span> <span class="comment">=</span> <span class="comment">getCount()）代替直接获取字段值（i</span> <span class="comment">=</span> <span class="comment">mCount）。这是C</span><span class="literal">+</span><span class="literal">+</span><span class="comment">里非常好的习惯，并且这个习惯同样流行于其他面向对象语言里。</span>
 <span class="comment">但是在Android里，这不是好的想法。调用虚函数的代价是高昂的，比通过访问字段值成本要高得多。在公共接口里可以遵循面向对象编程里使用getter/setter的习惯，但是在一个类里面，应该直接访问字段值。</span>
