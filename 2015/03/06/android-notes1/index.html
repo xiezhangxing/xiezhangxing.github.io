@@ -80,7 +80,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-06T05:40:04.590Z" itemprop="dateModified">Mar 6 2015</time>
+    Updated:<time datetime="2015-03-06T05:42:07.202Z" itemprop="dateModified">Mar 6 2015</time>
     
   </p>
 </header>
@@ -114,17 +114,25 @@
 <h2 id="使用static">使用static</h2>
 <p>如果不需要使用一个对象的属性，那么可以将函数设为static，这会使调用效率有大概15%到20%的提高。</p>
 <h2 id="常量使用Static_Final">常量使用Static Final</h2>
-<p>考虑下面两个声明：<br>    staticint intVal =42;<br>    staticString strVal =”Hello, world!”;</p>
-<p>当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。</clinit></p>
-<p>我们可以通过“final”关键字来改善这个过程：<br>    staticfinalint intVal =42;<br>    staticfinalString strVal =”Hello, world!”;</p>
-<p>此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></p>
+<p>考虑下面两个声明：</p>
+<pre><code>staticint <span class="variable">intVal =</span><span class="number">42</span>;
+staticString <span class="variable">strVal =</span><span class="string">"Hello, world!"</span>;
+</code></pre><p>当类第一次使用的时候，编译器调用<clinit>方法，生成类的构造函数。这个函数将值42储存到intVal，并且从类文件的String常量表里提取strVal的引用。当这两个值随后被引用的时候，他们通过字段查找来引用。</clinit></p>
+<p>我们可以通过“final”关键字来改善这个过程：</p>
+<pre><code>staticfinalint <span class="variable">intVal =</span><span class="number">42</span>;
+staticfinalString <span class="variable">strVal =</span><span class="string">"Hello, world!"</span>;
+</code></pre><p>此时类不再需要一个<clinit>方法，因为这两个常量直接存在了dex文件的静态字段初始化器里了。引用intVal的代码可以直接使用整形42的值，而引用strVal将会成本相对较低的字符串常量指令来取代字段查找。</clinit></p>
 <h2 id="避免内部Getter/Setter方法">避免内部Getter/Setter方法</h2>
 <p>在C++等本地语言中，习惯使用getter方法（i = getCount()）代替直接获取字段值（i = mCount）。这是C++里非常好的习惯，并且这个习惯同样流行于其他面向对象语言里。</p>
 <p>但是在Android里，这不是好的想法。调用虚函数的代价是高昂的，比通过访问字段值成本要高得多。在公共接口里可以遵循面向对象编程里使用getter/setter的习惯，但是在一个类里面，应该直接访问字段值。</p>
 <p>在没有JIT的设备里，值访问要比getter方法快3倍，而在JIT环境里，值访问要比getter方法快7倍。</p>
 <h2 id="使用增强的for循环">使用增强的for循环</h2>
-<p>增强的for循环（即for-each循环）可以用在实现了Iterable接口的容器和数组中。对ArrayList来说，for-each循环的速度要快3倍，但是其他容器则速度一样。<br>    staticclassFoo{<br>        int mSplat;<br>    }</p>
-<pre><code>Foo[] mArray =...
+<p>增强的for循环（即for-each循环）可以用在实现了Iterable接口的容器和数组中。对ArrayList来说，for-each循环的速度要快3倍，但是其他容器则速度一样。</p>
+<pre><code>staticclassFoo{
+    <span class="keyword">int</span> mSplat;
+}
+
+Foo[] mArray =...
 
 publicvoid zero(){
     <span class="keyword">int</span> <span class="keyword">sum</span> =<span class="number">0</span>;
