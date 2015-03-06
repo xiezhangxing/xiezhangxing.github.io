@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>[Android笔记之性能优化篇（一）——性能优化小技巧] | Jason Xie</title>
+    <title>Android笔记之性能优化篇（一）——性能优化小技巧 | Jason Xie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="Jason Xie">
@@ -72,7 +72,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/06/android-notes1/" title="[Android笔记之性能优化篇（一）——性能优化小技巧]" itemprop="url">[Android笔记之性能优化篇（一）——性能优化小技巧]</a>
+      <a href="/2015/03/06/android-notes1/" title="Android笔记之性能优化篇（一）——性能优化小技巧" itemprop="url">Android笔记之性能优化篇（一）——性能优化小技巧</a>
   </h1>
   <p class="article-author">By
     
@@ -80,7 +80,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-06T05:42:07.202Z" itemprop="dateModified">Mar 6 2015</time>
+    Updated:<time datetime="2015-03-06T05:43:45.510Z" itemprop="dateModified">Mar 6 2015</time>
     
   </p>
 </header>
@@ -161,8 +161,15 @@ publicvoid two(){
 <p>one()稍快，它将所有东西都存为本地变量，避免了查找过程。只有数组长度不必计算这一点得到了提升。</p>
 <p>tow()在JIT环境里是最快的，但是在非JIT环境里跟one()速度一样。</p>
 <h2 id="使用包访问代替私有内部类访问">使用包访问代替私有内部类访问</h2>
-<p>思考如下类定义：<br>    publicclassFoo{<br>        privateclassInner{<br>            void stuff(){<br>                Foo.this.doStuff(Foo.this.mValue);<br>            }<br>        }</p>
-<pre><code>    privateint mValue;
+<p>思考如下类定义：</p>
+<pre><code>publicclassFoo{
+    privateclassInner{
+        <span class="keyword">void</span> stuff(){
+            Foo.<span class="keyword">this</span>.doStuff(Foo.<span class="keyword">this</span>.mValue);
+        }
+    }
+
+    privateint mValue;
 
     publicvoid run(){
         Innerin=newInner();
@@ -175,8 +182,14 @@ publicvoid two(){
     }
 }
 </code></pre><p>注意我们在这里定义了可直接访问外部类的私有属性和私有方法的私有内部类（Foo$Inner）。这是合法的，并且代码运行的结果正如我们期待的那样打印了“Value is 27”。</p>
-<p>问题是因为Foo和Foo$Inner是不同的类，VM认为在Foo$Inner直接访问Foo的私有成员是非法的，即使在Java里允许内部类访问外部类的私有成员。为了弥补这一点，编译器生成了成对出现的如下代码：<br>    /<em>package</em>/staticintFoo.access$100(Foo foo){<br>        return foo.mValue;<br>    }<br>    /<em>package</em>/staticvoidFoo.access$200(Foo foo,int value){<br>        foo.doStuff(value);<br>    }</p>
-<p>当内部类访问外部类的私有成员时，都会调用这样的静态方法。这意味着，以上代码可以归结为通过accessor方法来访问成员变量。我们前文谈到accessor方式比直接访问要慢，这里就是一个语言习惯如何以你难以注意到的方式影响性能的例子。</p>
+<p>问题是因为Foo和Foo$Inner是不同的类，VM认为在Foo$Inner直接访问Foo的私有成员是非法的，即使在Java里允许内部类访问外部类的私有成员。为了弥补这一点，编译器生成了成对出现的如下代码：</p>
+<pre><code><span class="comment">/*package*/</span>staticintFoo.access$<span class="number">100</span>(Foo foo){
+    <span class="keyword">return</span> foo.mValue;
+}
+<span class="comment">/*package*/</span>staticvoidFoo.access$<span class="number">200</span>(Foo foo,<span class="keyword">int</span> <span class="keyword">value</span>){
+    foo.doStuff(<span class="keyword">value</span>);
+}
+</code></pre><p>当内部类访问外部类的私有成员时，都会调用这样的静态方法。这意味着，以上代码可以归结为通过accessor方法来访问成员变量。我们前文谈到accessor方式比直接访问要慢，这里就是一个语言习惯如何以你难以注意到的方式影响性能的例子。</p>
 <p>如果在对性能要求高的地方写这样的代码，我们应该使用包访问而不要用内部类。但是，这样写意味着这些属性可以被同一个包里的类访问，所以不要再公开API里这样写。</p>
 <h2 id="不要使用float类型">不要使用float类型</h2>
 <p>在Android设备里，float型要比integer慢两倍。</p>
@@ -199,7 +212,7 @@ publicvoid two(){
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/03/06/android-notes1/" data-title="[Android笔记之性能优化篇（一）——性能优化小技巧] | Jason Xie" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/03/06/android-notes1/" data-title="Android笔记之性能优化篇（一）——性能优化小技巧 | Jason Xie" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
