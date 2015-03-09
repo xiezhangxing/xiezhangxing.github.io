@@ -9,11 +9,14 @@
     
     <meta name="author" content="Jason Xie">
     
-    <meta name="description" content="本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。
+    <meta name="description" content="参考文章：Performance Tips
+本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。
 编写高效的代码必须遵循两个原则：
 
 一是不要做非必须的工作。
-二是避免分配不必要的内存。">
+二是避免分配不必要的内存。
+
+优化Android程序中最复杂的一个难题是app要运行在不同的设备中。不同的处理器上不同的虚拟机版本的速度肯定不一样。另外设备有没有JIT导致的结果也会不一样：在有JIT的设备上的良好的代码不一定在没有JIT的设备上仍然表现良好。">
     
     
     
@@ -72,7 +75,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/06/android-notes1/" title="Android笔记之性能优化篇（一）——性能优化小技巧" itemprop="url">Android笔记之性能优化篇（一）——性能优化小技巧</a>
+      <a href="/2015/03/06/Android笔记之性能优化篇（一）——性能优化小技巧/" title="Android笔记之性能优化篇（一）——性能优化小技巧" itemprop="url">Android笔记之性能优化篇（一）——性能优化小技巧</a>
   </h1>
   <p class="article-author">By
     
@@ -80,7 +83,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-06T05:46:50.442Z" itemprop="dateModified">Mar 6 2015</time>
+    Updated:<time datetime="2015-03-09T06:30:34.706Z" itemprop="dateModified">Mar 9 2015</time>
     
   </p>
 </header>
@@ -92,13 +95,15 @@
 		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">4.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">5.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">6.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">7.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">8.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">9.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">10.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">11.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
 		</div>
 		
-		<p>本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。</p>
+		<p>参考文章：<a href="&quot;http://developer.android.com/training/articles/perf-tips.html&quot;">Performance Tips</a></p>
+<p>本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。</p>
 <p>编写高效的代码必须遵循两个原则：</p>
 <ul>
 <li>一是不要做非必须的工作。</li>
 <li>二是避免分配不必要的内存。</li>
 </ul>
 <p>优化Android程序中最复杂的一个难题是app要运行在不同的设备中。不同的处理器上不同的虚拟机版本的速度肯定不一样。另外设备有没有JIT导致的结果也会不一样：在有JIT的设备上的良好的代码不一定在没有JIT的设备上仍然表现良好。</p>
+<a id="more"></a>
 <h2 id="避免创建不必要的对象">避免创建不必要的对象</h2>
 <p>创建对象是需要消耗资源的。当在app中创建更多对象时，会导致系统周期性地进行垃圾回收，这会影响到用户体验的流畅性。虽然在Android2.3后引入了并发的垃圾回收机制，但仍然应该避免做不必要的工作。</p>
 <p>所以，我们应该避免创建不必要的对象。比如：</p>
@@ -213,7 +218,7 @@ publicvoid two(){
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/03/06/android-notes1/" data-title="Android笔记之性能优化篇（一）——性能优化小技巧 | Jason Xie" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/03/06/Android笔记之性能优化篇（一）——性能优化小技巧/" data-title="Android笔记之性能优化篇（一）——性能优化小技巧 | Jason Xie" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
