@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>[Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库] | Jason Xie</title>
+    <title>Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库 | Jason Xie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="Jason Xie">
@@ -68,7 +68,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" title="[Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库]" itemprop="url">[Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库]</a>
+      <a href="/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" title="Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库" itemprop="url">Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库</a>
   </h1>
   <p class="article-author">By
     
@@ -76,7 +76,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-09T06:41:48.000Z" itemprop="datePublished">Mar 9 2015</time>
-    Updated:<time datetime="2015-03-09T06:56:12.650Z" itemprop="dateModified">Mar 9 2015</time>
+    Updated:<time datetime="2015-03-09T07:00:06.526Z" itemprop="dateModified">Mar 9 2015</time>
     
   </p>
 </header>
@@ -103,7 +103,7 @@
 </li>
 </ul>
 <h2 id="在项目中集成SQLCipher">在项目中集成SQLCipher</h2>
-<p>首先下载Android版本的SQLCipher工具包<a href="https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip，解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，" target="_blank" rel="external">https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip，解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，</a></p>
+<p>首先下载Android版本的[SQLCipher工具包]（<a href="https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip），解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，" target="_blank" rel="external">https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip），解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，</a></p>
 <p>在程序里只需要做两件事情。</p>
 <ul>
 <li><p>一是创建一个MyDatabaseHelper继承自net.sqlcipher.database.SQLiteOpenHelper，除了引入的包不同之外，其他用法跟</p>
@@ -128,7 +128,7 @@ db.execSQL(<span class="type">CREATE_TABLE</span>);
 <ul>
 <li>二是在需要用到数据库的地方，使用以下代码对数据库文件的加密：<br>  private static final String key = “secret_key”;<br>  db = dbHelper.getWritableDatabase(key);</li>
 </ul>
-<p>经过这两个步骤，数据库文件已经是加密的了。进入/data/data/<package_name>/database目录，尝试打开数据库文件，可以看到有个错误提示，提示信息是文件已加密或者不是数据库文件。<br><a href="http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png" target="_blank" rel="external">提示</a></package_name></p>
+<p>经过这两个步骤，数据库文件已经是加密的了。进入/data/data/<package_name>/database目录，尝试打开数据库文件，可以看到有个错误提示，提示信息是文件已加密或者不是数据库文件。<br>！<a href="http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png" target="_blank" rel="external">提示</a></package_name></p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -138,7 +138,7 @@ db.execSQL(<span class="type">CREATE_TABLE</span>);
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" data-title="[Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库] | Jason Xie" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" data-title="Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库 | Jason Xie" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
