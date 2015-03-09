@@ -9,7 +9,8 @@
     
     <meta name="author" content="Jason Xie">
     
-    <meta name="description" content="参考文章：Performance Tips
+    <meta name="description" content="参考文章：
+Performance Tips
 本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。
 编写高效的代码必须遵循两个原则：
 
@@ -83,7 +84,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-06T05:25:45.000Z" itemprop="datePublished">Mar 6 2015</time>
-    Updated:<time datetime="2015-03-09T06:34:03.530Z" itemprop="dateModified">Mar 9 2015</time>
+    Updated:<time datetime="2015-03-09T06:41:28.382Z" itemprop="dateModified">Mar 9 2015</time>
     
   </p>
 </header>
@@ -92,10 +93,11 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">4.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">5.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">6.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">7.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">8.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">9.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">10.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">11.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#参考文章："><span class="toc-number">1.</span> <span class="toc-text">参考文章：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">2.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">3.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">4.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">5.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">6.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">7.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">8.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">9.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">10.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">11.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">12.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
 		</div>
 		
-		<p>参考文章：<a href="http://developer.android.com/training/articles/perf-tips.html" target="_blank" rel="external">Performance Tips</a></p>
+		<h2 id="参考文章：">参考文章：</h2>
+<p><a href="http://developer.android.com/training/articles/perf-tips.html" target="_blank" rel="external">Performance Tips</a></p>
 <p>本文旨在总结一些在开发中能用到的可以提升app性能的小技巧，但是不要奢望于使用这些技巧可以使app的性能有根本性的提高。提升app的性能的根本办法还是合理选择良好的算法与数据结构，本文介绍的小技巧只是一种补充。</p>
 <p>编写高效的代码必须遵循两个原则：</p>
 <ul>
@@ -227,6 +229,14 @@ Foo[] mArray =...
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" title="[Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库]">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  [Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库]</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2015/03/03/Android笔记之性能优化篇（零）——内存管理/"  title="Android笔记之性能优化篇（零）——内存管理">
@@ -244,7 +254,7 @@ Foo[] mArray =...
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">1.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">2.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">3.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">4.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">5.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">6.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">7.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">8.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">9.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">10.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">11.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#参考文章："><span class="toc-number">1.</span> <span class="toc-text">参考文章：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免创建不必要的对象"><span class="toc-number">2.</span> <span class="toc-text">避免创建不必要的对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用static"><span class="toc-number">3.</span> <span class="toc-text">使用static</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#常量使用Static_Final"><span class="toc-number">4.</span> <span class="toc-text">常量使用Static Final</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免内部Getter/Setter方法"><span class="toc-number">5.</span> <span class="toc-text">避免内部Getter/Setter方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用增强的for循环"><span class="toc-number">6.</span> <span class="toc-text">使用增强的for循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用包访问代替私有内部类访问"><span class="toc-number">7.</span> <span class="toc-text">使用包访问代替私有内部类访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不要使用float类型"><span class="toc-number">8.</span> <span class="toc-text">不要使用float类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#了解并使用库"><span class="toc-number">9.</span> <span class="toc-text">了解并使用库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小心使用native方法"><span class="toc-number">10.</span> <span class="toc-text">小心使用native方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#性能误解"><span class="toc-number">11.</span> <span class="toc-text">性能误解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#估算程序性能"><span class="toc-number">12.</span> <span class="toc-text">估算程序性能</span></a></li></ol>
   </div>
 
 <div id="asidepart">
