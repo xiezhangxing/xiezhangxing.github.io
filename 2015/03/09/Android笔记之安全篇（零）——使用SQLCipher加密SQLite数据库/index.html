@@ -76,7 +76,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-09T06:41:48.000Z" itemprop="datePublished">Mar 9 2015</time>
-    Updated:<time datetime="2015-03-09T07:07:38.518Z" itemprop="dateModified">Mar 9 2015</time>
+    Updated:<time datetime="2015-03-09T07:14:57.690Z" itemprop="dateModified">Mar 9 2015</time>
     
   </p>
 </header>
@@ -103,29 +103,39 @@
 </li>
 </ul>
 <h2 id="在项目中集成SQLCipher">在项目中集成SQLCipher</h2>
-<p>首先下载Android版本的 [SQLCipher工具包]（<a href="https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip），解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，" target="_blank" rel="external">https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip），解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，</a></p>
+<p>首先下载Android版本的<a href="https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip" target="_blank" rel="external">SQLCipher工具包</a>，解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了，</p>
 <p>在程序里只需要做两件事情。</p>
-<ul>
-<li><p>一是创建一个MyDatabaseHelper继承自net.sqlcipher.database.SQLiteOpenHelper，除了引入的包不同之外，其他用法跟</p>
-<p>  android.database.sqlite.SQLiteOpenHelper是一样的。</p>
-<p>  package com.jason.sqlciphertest;</p>
-<p>  import android.content.Context;<br>  import net.sqlcipher.database.SQLiteDatabase;<br>  import net.sqlcipher.database.SQLiteDatabase.CursorFactory;<br>  import net.sqlcipher.database.SQLiteOpenHelper;</p>
-<p>   public class MyDatabaseHelper extends SQLiteOpenHelper {</p>
-<p>   public static final String CREATE_TABLE = “create table Student(name text, age integer)”;</p>
-<p>   public MyDatabaseHelper(Context context, String name, CursorFactory factory, int version) {</p>
-<pre><code><span class="keyword">super</span>(context, name, factory, <span class="keyword">version</span>);
-<span class="comment">// TODO Auto-generated constructor stub</span>
-</code></pre><p>   }</p>
-<p> @Override<br> public void onCreate(SQLiteDatabase db) {</p>
-<pre><code>// <span class="type">TODO</span> <span class="type">Auto</span>-generated <span class="keyword">method</span> stub
-db.execSQL(<span class="type">CREATE_TABLE</span>);
-</code></pre><p> }</p>
-<p> @Override<br> public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {<br>  // TODO Auto-generated method stub</p>
-<p> }</p>
-</li>
-</ul>
-<p>}</p>
-<ul>
+<p>一是创建一个MyDatabaseHelper继承自net.sqlcipher.database.SQLiteOpenHelper，除了引入的包不同之外，其他用法跟<br>android.database.sqlite.SQLiteOpenHelper是一样的。</p>
+<pre><code><span class="keyword">package</span> com.jason.sqlciphertest;
+
+<span class="keyword">import</span> android.content.Context;
+<span class="keyword">import</span> net.sqlcipher.database.SQLiteDatabase;
+<span class="keyword">import</span> net.sqlcipher.database.SQLiteDatabase.CursorFactory;
+<span class="keyword">import</span> net.sqlcipher.database.SQLiteOpenHelper;
+
+<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDatabaseHelper</span> <span class="keyword">extends</span> <span class="title">SQLiteOpenHelper</span> </span>{
+
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CREATE_TABLE = <span class="string">"create table Student(name text, age integer)"</span>;
+
+<span class="keyword">public</span> <span class="title">MyDatabaseHelper</span>(Context context, String name, CursorFactory factory, <span class="keyword">int</span> version) {
+    <span class="keyword">super</span>(context, name, factory, version);
+    <span class="comment">// TODO Auto-generated constructor stub</span>
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span>(SQLiteDatabase db) {
+    <span class="comment">// TODO Auto-generated method stub</span>
+    db.execSQL(CREATE_TABLE);
+}
+
+<span class="annotation">@Override</span>
+<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onUpgrade</span>(SQLiteDatabase arg0, <span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2) {
+    <span class="comment">// TODO Auto-generated method stub</span>
+
+}
+
+}
+</code></pre><ul>
 <li><p>二是在需要用到数据库的地方，使用以下代码对数据库文件的加密：</p>
 <p>  private static final String key = “secret_key”;<br>  db = dbHelper.getWritableDatabase(key);</p>
 </li>
