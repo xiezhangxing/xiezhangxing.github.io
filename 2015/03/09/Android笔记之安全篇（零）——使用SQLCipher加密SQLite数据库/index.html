@@ -76,7 +76,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-09T06:41:48.000Z" itemprop="datePublished">Mar 9 2015</time>
-    Updated:<time datetime="2015-03-09T07:14:57.690Z" itemprop="dateModified">Mar 9 2015</time>
+    Updated:<time datetime="2015-03-09T07:18:39.162Z" itemprop="dateModified">Mar 9 2015</time>
     
   </p>
 </header>
@@ -136,12 +136,10 @@
 
 }
 </code></pre><ul>
-<li><p>二是在需要用到数据库的地方，使用以下代码对数据库文件的加密：</p>
-<p>  private static final String key = “secret_key”;<br>  db = dbHelper.getWritableDatabase(key);</p>
-</li>
+<li>二是在需要用到数据库的地方，使用以下代码对数据库文件的加密：<br>  private static final String key = “secret_key”;<br>  db = dbHelper.getWritableDatabase(key);</li>
 </ul>
 <p>经过这两个步骤，数据库文件已经是加密的了。进入/data/data/<package_name>/database目录，尝试打开数据库文件，可以看到有个错误提示，提示信息是文件已加密或者不是数据库文件。</package_name></p>
-<p>！<a href="http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png" target="_blank" rel="external">Alt text</a></p>
+<p>![提示]<a href="http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png" target="_blank" rel="external">http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png</a>)</p>
   
 	</div>
 		<footer class="article-footer clearfix">
