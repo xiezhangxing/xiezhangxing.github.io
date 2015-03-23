@@ -77,7 +77,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-23T01:24:05.000Z" itemprop="datePublished">Mar 23 2015</time>
-    Updated:<time datetime="2015-03-23T01:31:50.716Z" itemprop="dateModified">Mar 23 2015</time>
+    Updated:<time datetime="2015-03-23T01:33:38.576Z" itemprop="dateModified">Mar 23 2015</time>
     
   </p>
 </header>
@@ -105,7 +105,14 @@
 <p>可以看到上例中引起性能瓶颈的地方在于嵌套的LinearLayout，通过把布局的层次压扁可以提升性能——目标是将布局层次改为扁而宽，而非窄而深。以RelativeLayout为根节点的布局可以实现这样的布局，这样整个布局将从3层变成两层：<br><img src="http://7vzso0.com1.z0.glb.clouddn.com/3.png" alt="图4"></p>
 <p>这看起来是一个非常细小的提升，但是在ListView里，每一个item的提升将会带来整个ListView的较大的性能提升。</p>
 <h2 id="使用lint">使用lint</h2>
-<p>使用lint工具来对layout文件查找可以存在的可以提升的地方是一个良好的习惯。lint会帮助做一些优化。lint的一些规则：<br>使用compound drawable——一个包含图片和文字的LinearLayout可以使用一个compound drawable来代替以更高效。<br>合并root frame——如果FrameLayout是根节点，并且没有background或者padding之类的，它将会被一个merge标签代替。<br>无效的叶子节点——一个无子节点且无background的叶子节点将会被移出。<br>无效的父节点——只有一个子节点，又不是ScrollView或者根节点，且没有background的，该父节点将会被移出，并且将唯一的子节点移到原父节点一层。<br>深布局——有太多嵌套的布局的性能是非常糟糕的。默认最深的层次是10层。</p>
+<p>使用lint工具来对layout文件查找可以存在的可以提升的地方是一个良好的习惯。lint会帮助做一些优化。lint的一些规则：</p>
+<ul>
+<li>使用compound drawable——一个包含图片和文字的LinearLayout可以使用一个compound drawable来代替以更高效。</li>
+<li>合并root frame——如果FrameLayout是根节点，并且没有background或者padding之类的，它将会被一个merge标签代替。</li>
+<li>无效的叶子节点——一个无子节点且无background的叶子节点将会被移出。</li>
+<li>无效的父节点——只有一个子节点，又不是ScrollView或者根节点，且没有background的，该父节点将会被移出，并且将唯一的子节点移到原父节点一层。</li>
+<li>深布局——有太多嵌套的布局的性能是非常糟糕的。默认最深的层次是10层。</li>
+</ul>
 <p>在Android Studio里，已经完美集成了lint，每一次编译程序的时候，lint都会自动运行。</p>
   
 	</div>
