@@ -4,12 +4,12 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库 | Jason Xie</title>
+    <title>Android笔记之性能优化篇（二）——优化布局层次 | Jason Xie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="Jason Xie">
     
-    <meta name="description" content="在移动设备上，不管是iOS还是Android，一般都使用SQLite存储数据。SQLite是轻量级、跨平台、开源的数据库，是移动设备最优的数据库方案。但是使用免费版的SQLite是使用明文存储数据的，毫无疑问会带来数据安全性的问题。在Android中，程序生成的数据库文件存储在/data/data/">
+    <meta name="description" content="参考文章：Optimizing Layout Hierarchies">
     
     
     
@@ -68,15 +68,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" title="Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库" itemprop="url">Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库</a>
+      <a href="/2015/03/23/Android笔记之性能优化篇（二）——优化布局层次/" title="Android笔记之性能优化篇（二）——优化布局层次" itemprop="url">Android笔记之性能优化篇（二）——优化布局层次</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://yoursite.com" title="Jason Xie">Jason Xie</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-03-09T06:41:48.000Z" itemprop="datePublished">Mar 9 2015</time>
-    Updated:<time datetime="2015-03-09T07:22:12.706Z" itemprop="dateModified">Mar 9 2015</time>
+    <time datetime="2015-03-23T01:24:05.000Z" itemprop="datePublished">Mar 23 2015</time>
+    Updated:<time datetime="2015-03-23T01:26:46.160Z" itemprop="dateModified">Mar 23 2015</time>
     
   </p>
 </header>
@@ -85,73 +85,25 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#实现SQLite加密的几种方式"><span class="toc-number">1.</span> <span class="toc-text">实现SQLite加密的几种方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在项目中集成SQLCipher"><span class="toc-number">2.</span> <span class="toc-text">在项目中集成SQLCipher</span></a></li></ol>
+		
 		</div>
 		
-		<p>在移动设备上，不管是iOS还是Android，一般都使用SQLite存储数据。SQLite是轻量级、跨平台、开源的数据库，是移动设备最优的数据库方案。但是使用免费版的SQLite是使用明文存储数据的，毫无疑问会带来数据安全性的问题。在Android中，程序生成的数据库文件存储在/data/data/<package_name>/database里，取得root权限的手机可以进入这一目录，可以使用文本编辑器查看数据库文件，使得信息暴露无遗。因此，对于程序中会涉及到敏感信息的app来说，必须解决数据库加密的问题。</package_name></p>
-<h2 id="实现SQLite加密的几种方式">实现SQLite加密的几种方式</h2>
-<ul>
-<li><p><a href="http://www.hwaci.com/sw/sqlite/see.html" target="_blank" rel="external">SEE</a><br>官方实现版本，收费。其实SQLite在设计过程中就已经考虑了安全问题并预留了相关接口，不过在免费版中没有给出，在收费版本中实现了。</p>
-</li>
-<li><p><a href="http://sqlite-crypt.com/index.htm" target="_blank" rel="external">SQLite Crypt</a><br>收费。</p>
-</li>
-<li><p><a href="http://sourceforge.net/projects/wxsqlite/" target="_blank" rel="external">wxSQlite</a><br>免费，须自己编译。</p>
-</li>
-<li><p><a href="https://github.com/OlivierJG/botansqlite3" target="_blank" rel="external">botansqlite3</a><br>开源。</p>
-</li>
-<li><p><a href="https://www.zetetic.net/sqlcipher/" target="_blank" rel="external">SQLCipher</a><br>开源，分收费版和免费版，区别只是收费版集成更方便，编译速度更快。本文主要介绍此方法。</p>
-</li>
-</ul>
-<h2 id="在项目中集成SQLCipher">在项目中集成SQLCipher</h2>
-<p>首先下载Android版本的<a href="https://s3.amazonaws.com/sqlcipher/3.2.0/sqlcipher-for-android-community-v3.2.0.zip" target="_blank" rel="external">SQLCipher工具包</a>，解压，将assets和libs里的armeabi及sqlcipher.jar放到工程目录的对应位置。这样就把相应的sqlcipher工具集成到项目里了。<br><img src="http://7vzso0.com1.z0.glb.clouddn.com/sqlcipher.jpg" alt="集成"></p>
-<p>在程序里只需要做两件事情。</p>
-<p>一是创建一个MyDatabaseHelper继承自net.sqlcipher.database.SQLiteOpenHelper，除了引入的包不同之外，其他用法跟<br>android.database.sqlite.SQLiteOpenHelper是一样的。</p>
-<pre><code><span class="keyword">package</span> com.jason.sqlciphertest;
-
-<span class="keyword">import</span> android.content.Context;
-<span class="keyword">import</span> net.sqlcipher.database.SQLiteDatabase;
-<span class="keyword">import</span> net.sqlcipher.database.SQLiteDatabase.CursorFactory;
-<span class="keyword">import</span> net.sqlcipher.database.SQLiteOpenHelper;
-
-<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDatabaseHelper</span> <span class="keyword">extends</span> <span class="title">SQLiteOpenHelper</span> </span>{
-
-<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CREATE_TABLE = <span class="string">"create table Student(name text, age integer)"</span>;
-
-<span class="keyword">public</span> <span class="title">MyDatabaseHelper</span>(Context context, String name, CursorFactory factory, <span class="keyword">int</span> version) {
-    <span class="keyword">super</span>(context, name, factory, version);
-    <span class="comment">// TODO Auto-generated constructor stub</span>
-}
-
-<span class="annotation">@Override</span>
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span>(SQLiteDatabase db) {
-    <span class="comment">// TODO Auto-generated method stub</span>
-    db.execSQL(CREATE_TABLE);
-}
-
-<span class="annotation">@Override</span>
-<span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onUpgrade</span>(SQLiteDatabase arg0, <span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2) {
-    <span class="comment">// TODO Auto-generated method stub</span>
-
-}
-
-}
-</code></pre><ul>
-<li><p>二是在需要用到数据库的地方，使用以下代码对数据库文件的加密：</p>
-<p>  private static final String key = “secret_key”;<br>  db = dbHelper.getWritableDatabase(key);</p>
-</li>
-</ul>
-<p>经过这两个步骤，数据库文件已经是加密的了。进入/data/data/<package_name>/database目录，尝试打开数据库文件，可以看到有个错误提示，提示信息是文件已加密或者不是数据库文件。</package_name></p>
-<p><img src="http://7vzso0.com1.z0.glb.clouddn.com/Screenshot_2015-03-09-12-04-02.png" alt="提示"></p>
+		<p>参考文章：<a href="http://developer.android.com/training/improving-layouts/optimizing-layout.html" target="_blank" rel="external">Optimizing Layout Hierarchies</a></p>
   
 	</div>
 		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a><a href="/tags/优化/">优化</a>
+  </div>
 
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/" data-title="Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库 | Jason Xie" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/03/23/Android笔记之性能优化篇（二）——优化布局层次/" data-title="Android笔记之性能优化篇（二）——优化布局层次 | Jason Xie" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -160,19 +112,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/03/23/Android笔记之性能优化篇（二）——优化布局层次/" title="Android笔记之性能优化篇（二）——优化布局层次">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  Android笔记之性能优化篇（二）——优化布局层次</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/03/06/Android笔记之性能优化篇（一）——性能优化小技巧/"  title="Android笔记之性能优化篇（一）——性能优化小技巧">
+<a href="/2015/03/09/Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库/"  title="Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库">
  <strong>NEXT:</strong><br/> 
- <span>Android笔记之性能优化篇（一）——性能优化小技巧
+ <span>Android笔记之安全篇（零）——使用SQLCipher加密SQLite数据库
 </span>
 </a>
 </div>
@@ -185,7 +129,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#实现SQLite加密的几种方式"><span class="toc-number">1.</span> <span class="toc-text">实现SQLite加密的几种方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在项目中集成SQLCipher"><span class="toc-number">2.</span> <span class="toc-text">在项目中集成SQLCipher</span></a></li></ol>
+  
   </div>
 
 <div id="asidepart">
