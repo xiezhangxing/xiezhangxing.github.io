@@ -9,7 +9,8 @@
     
     <meta name="author" content="Jason Xie">
     
-    <meta name="description" content="参考文章：Optimizing Layout Hierarchies">
+    <meta name="description" content="参考文章：Optimizing Layout Hierarchies
+认为使用基本的布局结构是最高效的布局是一个广泛存在的误解。程序中的每一个控件和布局都需要经过初始化、布局和绘制三个过程。比如说，使用嵌套的LinearlLayout会导致布局层次太深。此外，使用layout_weight参数嵌套多">
     
     
     
@@ -76,7 +77,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-03-23T01:24:05.000Z" itemprop="datePublished">Mar 23 2015</time>
-    Updated:<time datetime="2015-03-23T01:26:46.160Z" itemprop="dateModified">Mar 23 2015</time>
+    Updated:<time datetime="2015-03-23T01:31:50.716Z" itemprop="dateModified">Mar 23 2015</time>
     
   </p>
 </header>
@@ -85,17 +86,34 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#检查布局"><span class="toc-number">1.</span> <span class="toc-text">检查布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改布局"><span class="toc-number">2.</span> <span class="toc-text">修改布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用lint"><span class="toc-number">3.</span> <span class="toc-text">使用lint</span></a></li></ol>
 		</div>
 		
 		<p>参考文章：<a href="http://developer.android.com/training/improving-layouts/optimizing-layout.html" target="_blank" rel="external">Optimizing Layout Hierarchies</a></p>
+<p>认为使用基本的布局结构是最高效的布局是一个广泛存在的误解。程序中的每一个控件和布局都需要经过初始化、布局和绘制三个过程。比如说，使用嵌套的LinearlLayout会导致布局层次太深。此外，使用layout_weight参数嵌套多个LinearLayout的代价会非常高，因为所有的子项都要被测量两次。这些概念在布局需要多次使用的地方尤其重要，比如ListView和GridView。</p>
+<p>本文将介绍使用Hierarchy Viewer和Lint来检查和优化布局。</p>
+<h2 id="检查布局">检查布局</h2>
+<p>在Android SDK里包含了名为Hierarchy Viewer的工具，它可以在程序运行的时候分析布局结构。使用该工具可以帮助发现在布局上的性能瓶颈。</p>
+<p>Hierachy Viewer允许选择在设备或模拟器上运行的进程，然后显示布局层次结构。红黄绿圆点表示测量、布局和绘制的性能，帮助发现可能存在的问题。</p>
+<p>图1显示了在ListView中一个item的布局。这个布局在左边显示一张图片，在右边显示两行文字。像这个例子一样，对于布局的优化会有几倍的叠加效果，因为这些布局会使用很多次。</p>
+<p><img src="http://7vzso0.com1.z0.glb.clouddn.com/0.png" alt="图1"></p>
+<p>在sdk/tools/路径里可以找到Hierarchy Viewer工具。打开Hierarchy Viewer后，会显示当前运行的设备和模拟器，以及其中的组件。点击选中的组件的Load View Hierarchy按钮，将会显示如图2的图形。</p>
+<p><img src="http://7vzso0.com1.z0.glb.clouddn.com/1.png" alt="图2"></p>
+<p>在图2中可以看到这个布局有三层，在显示文字的地方有一些性能问题。点击其中一个元素会显示该元素测量、布局和渲染的具体时间，如图3.</p>
+<p><img src="http://7vzso0.com1.z0.glb.clouddn.com/2.png" alt="图3"></p>
+<h2 id="修改布局">修改布局</h2>
+<p>可以看到上例中引起性能瓶颈的地方在于嵌套的LinearLayout，通过把布局的层次压扁可以提升性能——目标是将布局层次改为扁而宽，而非窄而深。以RelativeLayout为根节点的布局可以实现这样的布局，这样整个布局将从3层变成两层：<br><img src="http://7vzso0.com1.z0.glb.clouddn.com/3.png" alt="图4"></p>
+<p>这看起来是一个非常细小的提升，但是在ListView里，每一个item的提升将会带来整个ListView的较大的性能提升。</p>
+<h2 id="使用lint">使用lint</h2>
+<p>使用lint工具来对layout文件查找可以存在的可以提升的地方是一个良好的习惯。lint会帮助做一些优化。lint的一些规则：<br>使用compound drawable——一个包含图片和文字的LinearLayout可以使用一个compound drawable来代替以更高效。<br>合并root frame——如果FrameLayout是根节点，并且没有background或者padding之类的，它将会被一个merge标签代替。<br>无效的叶子节点——一个无子节点且无background的叶子节点将会被移出。<br>无效的父节点——只有一个子节点，又不是ScrollView或者根节点，且没有background的，该父节点将会被移出，并且将唯一的子节点移到原父节点一层。<br>深布局——有太多嵌套的布局的性能是非常糟糕的。默认最深的层次是10层。</p>
+<p>在Android Studio里，已经完美集成了lint，每一次编译程序的时候，lint都会自动运行。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/android/">android</a><a href="/tags/优化/">优化</a>
+  <span></span> <a href="/tags/android/">android</a><a href="/tags/性能/">性能</a>
   </div>
 
 
@@ -129,7 +147,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#检查布局"><span class="toc-number">1.</span> <span class="toc-text">检查布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改布局"><span class="toc-number">2.</span> <span class="toc-text">修改布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用lint"><span class="toc-number">3.</span> <span class="toc-text">使用lint</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -145,9 +163,7 @@
 		
 			<li><a href="/tags/android/" title="android">android<sup>2</sup></a></li>
 		
-			<li><a href="/tags/优化/" title="优化">优化<sup>1</sup></a></li>
-		
-			<li><a href="/tags/性能/" title="性能">性能<sup>1</sup></a></li>
+			<li><a href="/tags/性能/" title="性能">性能<sup>2</sup></a></li>
 		
 		</ul>
 </div>
