@@ -4,10 +4,13 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Android笔记之性能优化篇（三）————避免Bitmap引起的OOM | Jason Xie</title>
+    <title>Android笔记之性能优化篇（三）————避免图片过大引起的OOM | Jason Xie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="Jason Xie">
+    
+    <meta name="description" content="参考文章：Loading Large Bitmaps Efficiently
+OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错误最常见的原因大多是因为加载了大量的bitmap引发。java.lang.OutofMemoryError: bitmap size ex">
     
     
     
@@ -66,7 +69,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/04/02/Android笔记之性能优化篇（三）——避免Bitmap引起的OOM/" title="Android笔记之性能优化篇（三）————避免Bitmap引起的OOM" itemprop="url">Android笔记之性能优化篇（三）————避免Bitmap引起的OOM</a>
+      <a href="/2015/04/02/Android笔记之性能优化篇（三）——避免图片过大引起的OOM/" title="Android笔记之性能优化篇（三）————避免图片过大引起的OOM" itemprop="url">Android笔记之性能优化篇（三）————避免图片过大引起的OOM</a>
   </h1>
   <p class="article-author">By
     
@@ -74,7 +77,7 @@
     </p>
   <p class="article-time">
     <time datetime="2015-04-02T05:50:53.000Z" itemprop="datePublished">Apr 2 2015</time>
-    Updated:<time datetime="2015-05-22T05:54:43.463Z" itemprop="dateModified">May 22 2015</time>
+    Updated:<time datetime="2015-05-25T02:20:46.820Z" itemprop="dateModified">May 25 2015</time>
     
   </p>
 </header>
@@ -83,19 +86,72 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#产生原因"><span class="toc-number">1.</span> <span class="toc-text">产生原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加载缩略图"><span class="toc-number">2.</span> <span class="toc-text">加载缩略图</span></a></li></ol>
 		</div>
 		
-		  
+		<p>参考文章：<a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html" target="_blank" rel="external">Loading Large Bitmaps Efficiently</a></p>
+<p>OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错误最常见的原因大多是因为加载了大量的bitmap引发。java.lang.OutofMemoryError: bitmap size exceeds VM budget，相信这个错误大多数Android developer都遇到过。</p>
+<h2 id="产生原因">产生原因</h2>
+<p>Bitmap引发的OOM通常由以下三个因素引发：</p>
+<ul>
+<li>在<a href="http://icodingnotes.com/2015/03/03/Android%E7%AC%94%E8%AE%B0%E4%B9%8B%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%AF%87%EF%BC%88%E9%9B%B6%EF%BC%89%E2%80%94%E2%80%94%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_blank" rel="external">Android笔记之性能优化篇（零）——内存管理</a>里提到的，Android为每一个app设定了堆栈大小的上限值，这个值可以通过ActivityManager.getMemoryClass()获得，某些手机这个值只有16M。如果app达到了堆栈的容量，再想分配更多内存时，就会导致OutOfMemorryError错误。</li>
+<li>Bitmap使用了大量的内存。例如一张2592x1936的图片，如果Bitmap.config设置为ARGB_8888（默认），加载这个图片大概需要大概19M的内存（2590×1936×4byte），在一些内存较小的手机上就会立刻崩溃了。</li>
+<li>在listview，gridview，viewpageer等地方需要同时加载多张图片，这时候非常容易导致OOM。<br>第一种原因是硬件层面，我们没有办法改变。第三种原因跟第二种原因其实有共性的地方，就是图片太大，而通常我们并不需要原始尺寸的图片，通过加载缩略图就可以避免相当多的OOM问题。</li>
+</ul>
+<h2 id="加载缩略图">加载缩略图</h2>
+<pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">calculateInSampleSize</span>(
+        BitmapFactory.Options options, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight) {
+    <span class="comment">// Raw height and width of image</span>
+    <span class="keyword">final</span> <span class="keyword">int</span> height = options.outHeight;
+    <span class="keyword">final</span> <span class="keyword">int</span> width = options.outWidth;
+    <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;
+
+    <span class="keyword">if</span> (height &gt; reqHeight || width &gt; reqWidth) {
+
+    <span class="keyword">final</span> <span class="keyword">int</span> halfHeight = height / <span class="number">2</span>;
+    <span class="keyword">final</span> <span class="keyword">int</span> halfWidth = width / <span class="number">2</span>;
+
+    <span class="comment">// Calculate the largest inSampleSize value that is a power of 2 and keeps both</span>
+    <span class="comment">// height and width larger than the requested height and width.</span>
+    <span class="keyword">while</span> ((halfHeight / inSampleSize) &gt; reqHeight
+            &amp;&amp; (halfWidth / inSampleSize) &gt; reqWidth) {
+        inSampleSize *= <span class="number">2</span>;
+    }
+    }
+
+    <span class="keyword">return</span> inSampleSize;
+}
+
+<span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">decodeSampledBitmapFromResource</span>(Resources res, <span class="keyword">int</span> resId,
+    <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight) {
+
+    <span class="comment">// First decode with inJustDecodeBounds=true to check dimensions</span>
+    <span class="keyword">final</span> BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();
+    options.inJustDecodeBounds = <span class="keyword">true</span>;
+    BitmapFactory.decodeResource(res, resId, options);
+
+    <span class="comment">// Calculate inSampleSize</span>
+    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+    <span class="comment">// Decode bitmap with inSampleSize set</span>
+    options.inJustDecodeBounds = <span class="keyword">false</span>;
+    <span class="keyword">return</span> BitmapFactory.decodeResource(res, resId, options);
+}
+</code></pre>  
 	</div>
 		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/android/">android</a><a href="/tags/性能/">性能</a>
+  </div>
 
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/04/02/Android笔记之性能优化篇（三）——避免Bitmap引起的OOM/" data-title="Android笔记之性能优化篇（三）————避免Bitmap引起的OOM | Jason Xie" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/04/02/Android笔记之性能优化篇（三）——避免图片过大引起的OOM/" data-title="Android笔记之性能优化篇（三）————避免图片过大引起的OOM | Jason Xie" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -121,7 +177,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#产生原因"><span class="toc-number">1.</span> <span class="toc-text">产生原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#加载缩略图"><span class="toc-number">2.</span> <span class="toc-text">加载缩略图</span></a></li></ol>
   </div>
 
 <div id="asidepart">
@@ -135,9 +191,9 @@
 	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
-			<li><a href="/tags/android/" title="android">android<sup>2</sup></a></li>
+			<li><a href="/tags/android/" title="android">android<sup>3</sup></a></li>
 		
-			<li><a href="/tags/性能/" title="性能">性能<sup>2</sup></a></li>
+			<li><a href="/tags/性能/" title="性能">性能<sup>3</sup></a></li>
 		
 		</ul>
 </div>
