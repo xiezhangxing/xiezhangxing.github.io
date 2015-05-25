@@ -77,7 +77,7 @@ OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错
     </p>
   <p class="article-time">
     <time datetime="2015-04-02T05:50:53.000Z" itemprop="datePublished">Apr 2 2015</time>
-    Updated:<time datetime="2015-05-25T02:20:46.820Z" itemprop="dateModified">May 25 2015</time>
+    Updated:<time datetime="2015-05-25T02:32:05.040Z" itemprop="dateModified">May 25 2015</time>
     
   </p>
 </header>
@@ -92,7 +92,7 @@ OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错
 		<p>参考文章：<a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html" target="_blank" rel="external">Loading Large Bitmaps Efficiently</a></p>
 <p>OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错误最常见的原因大多是因为加载了大量的bitmap引发。java.lang.OutofMemoryError: bitmap size exceeds VM budget，相信这个错误大多数Android developer都遇到过。</p>
 <h2 id="产生原因">产生原因</h2>
-<p>Bitmap引发的OOM通常由以下三个因素引发：</p>
+<p>Bitmap引发的OOM主要是以下三个因素引发：</p>
 <ul>
 <li>在<a href="http://icodingnotes.com/2015/03/03/Android%E7%AC%94%E8%AE%B0%E4%B9%8B%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E7%AF%87%EF%BC%88%E9%9B%B6%EF%BC%89%E2%80%94%E2%80%94%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_blank" rel="external">Android笔记之性能优化篇（零）——内存管理</a>里提到的，Android为每一个app设定了堆栈大小的上限值，这个值可以通过ActivityManager.getMemoryClass()获得，某些手机这个值只有16M。如果app达到了堆栈的容量，再想分配更多内存时，就会导致OutOfMemorryError错误。</li>
 <li>Bitmap使用了大量的内存。例如一张2592x1936的图片，如果Bitmap.config设置为ARGB_8888（默认），加载这个图片大概需要大概19M的内存（2590×1936×4byte），在一些内存较小的手机上就会立刻崩溃了。</li>
@@ -137,7 +137,8 @@ OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错
     options.inJustDecodeBounds = <span class="keyword">false</span>;
     <span class="keyword">return</span> BitmapFactory.decodeResource(res, resId, options);
 }
-</code></pre>  
+</code></pre><p>calculateInSampleSize()函数计算出在需要显示宽度为reqWidth,需要显示高度为reqHeight时，应该缩放的比例。decodeSampledBitmapFromResource()函数得到我们需要的经缩放后的bitmap，其中options.inJustDecodeBounds = true表示只读取图片信息，并不分配内存。至此，我们就能到得到满足条件的缩略图了，经缩小的图片使用的内存大幅减小。</p>
+  
 	</div>
 		<footer class="article-footer clearfix">
 
