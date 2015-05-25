@@ -77,7 +77,7 @@ OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错
     </p>
   <p class="article-time">
     <time datetime="2015-04-02T05:50:53.000Z" itemprop="datePublished">Apr 2 2015</time>
-    Updated:<time datetime="2015-05-25T02:34:20.524Z" itemprop="dateModified">May 25 2015</time>
+    Updated:<time datetime="2015-05-25T02:41:56.208Z" itemprop="dateModified">May 25 2015</time>
     
   </p>
 </header>
@@ -99,46 +99,10 @@ OOM(OutOfMemory)错误是在Android开发中比较常见的错误，引发该错
 <li>在listview，gridview，viewpageer等地方需要同时加载多张图片，这时候非常容易导致OOM。<br>第一种原因是硬件层面，我们没有办法改变。第三种原因跟第二种原因其实有共性的地方，就是图片太大，而通常我们并不需要原始尺寸的图片，通过加载缩略图就可以避免相当多的OOM问题。</li>
 </ul>
 <h2 id="加载缩略图">加载缩略图</h2>
-<pre><code><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">calculateInSampleSize</span>(
-        BitmapFactory.Options options, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight) {
-    <span class="comment">// Raw height and width of image</span>
-    <span class="keyword">final</span> <span class="keyword">int</span> height = options.outHeight;
-    <span class="keyword">final</span> <span class="keyword">int</span> width = options.outWidth;
-    <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;
+<lang:java><br>    public static int calculateInSampleSize(<br>            BitmapFactory.Options options, int reqWidth, int reqHeight) {<br>        // Raw height and width of image<br>        final int height = options.outHeight;<br>        final int width = options.outWidth;<br>        int inSampleSize = 1;<br><br>        if (height &gt; reqHeight || width &gt; reqWidth) {<br><br>        final int halfHeight = height / 2;<br>        final int halfWidth = width / 2;<br><br>        // Calculate the largest inSampleSize value that is a power of 2 and keeps both<br>        // height and width larger than the requested height and width.<br>        while ((halfHeight / inSampleSize) &gt; reqHeight<br>                &amp;&amp; (halfWidth / inSampleSize) &gt; reqWidth) {<br>            inSampleSize *= 2;<br>        }<br>        }<br><br>        return inSampleSize;<br>    }<br><br>    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,<br>        int reqWidth, int reqHeight) {<br><br>        // First decode with inJustDecodeBounds=true to check dimensions<br>        final BitmapFactory.Options options = new BitmapFactory.Options();<br>        options.inJustDecodeBounds = true;<br>        BitmapFactory.decodeResource(res, resId, options);<br><br>        // Calculate inSampleSize<br>        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);<br><br>        // Decode bitmap with inSampleSize set<br>        options.inJustDecodeBounds = false;<br>        return BitmapFactory.decodeResource(res, resId, options);<br>    }<br><br>
 
-    <span class="keyword">if</span> (height &gt; reqHeight || width &gt; reqWidth) {
-
-    <span class="keyword">final</span> <span class="keyword">int</span> halfHeight = height / <span class="number">2</span>;
-    <span class="keyword">final</span> <span class="keyword">int</span> halfWidth = width / <span class="number">2</span>;
-
-    <span class="comment">// Calculate the largest inSampleSize value that is a power of 2 and keeps both</span>
-    <span class="comment">// height and width larger than the requested height and width.</span>
-    <span class="keyword">while</span> ((halfHeight / inSampleSize) &gt; reqHeight
-            &amp;&amp; (halfWidth / inSampleSize) &gt; reqWidth) {
-        inSampleSize *= <span class="number">2</span>;
-    }
-    }
-
-    <span class="keyword">return</span> inSampleSize;
-}
-
-<span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">decodeSampledBitmapFromResource</span>(Resources res, <span class="keyword">int</span> resId,
-    <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHeight) {
-
-    <span class="comment">// First decode with inJustDecodeBounds=true to check dimensions</span>
-    <span class="keyword">final</span> BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();
-    options.inJustDecodeBounds = <span class="keyword">true</span>;
-    BitmapFactory.decodeResource(res, resId, options);
-
-    <span class="comment">// Calculate inSampleSize</span>
-    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-    <span class="comment">// Decode bitmap with inSampleSize set</span>
-    options.inJustDecodeBounds = <span class="keyword">false</span>;
-    <span class="keyword">return</span> BitmapFactory.decodeResource(res, resId, options);
-}
-</code></pre><p>calculateInSampleSize()函数计算出在需要显示宽度为reqWidth,需要显示高度为reqHeight时，应该缩放的比例。decodeSampledBitmapFromResource()函数得到我们需要的经缩放后的bitmap，其中options.inJustDecodeBounds = true表示只读取图片信息，并不分配内存。至此，我们就能到得到满足条件的缩略图了，经缩小的图片使用的内存大幅减小。</p>
-  
+<p>calculateInSampleSize()函数计算出在需要显示宽度为reqWidth,需要显示高度为reqHeight时，应该缩放的比例。decodeSampledBitmapFromResource()函数得到我们需要的经缩放后的bitmap，其中options.inJustDecodeBounds = true表示只读取图片信息，并不分配内存。至此，我们就能到得到满足条件的缩略图了，经缩小的图片使用的内存大幅减小。</p>
+</lang:java>  
 	</div>
 		<footer class="article-footer clearfix">
 
